@@ -1,18 +1,19 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
+
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<link rel="icon" href="https://static.nowcoder.com/images/logo_87_87.png"/>
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" crossorigin="anonymous">
-	<link rel="stylesheet" href="../css/global.css" />
-	<link rel="stylesheet" href="../css/letter.css" />
-	<title>牛客网-私信详情</title>
+	<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css" crossorigin="anonymous">
+	<link rel="stylesheet" th:href="@{/css/global.css}"/>
+	<link rel="stylesheet" th:href="@{/css/letter.css}"/>
+	<title>校园社区-私信详情</title>
 </head>
 <body>
 	<div class="nk-container">
 		<!-- 头部 -->
-		<header class="bg-dark sticky-top">
+		<header class="bg-dark sticky-top" th:replace="index::header">
 			<div class="container">
 				<!-- 导航 -->
 				<nav class="navbar navbar-expand-lg navbar-dark">
@@ -64,14 +65,14 @@
 			<div class="container">
 				<div class="row">
 					<div class="col-8">
-						<h6><b class="square"></b> 来自 <i class="text-success">落基山脉下的闲人</i> 的私信</h6>
+						<h6><b class="square"></b> 来自 <i class="text-success" th:text="${target.username}">落基山脉下的闲人</i> 的私信</h6>
 					</div>
 					<div class="col-4 text-right">
-						<button type="button" class="btn btn-secondary btn-sm" onclick="location.href='letter.html';">返回</button>
+						<a th:href="@{/message/letter/list}" class="btn btn-outline-secondary btn-sm">返回</a>
 						<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#sendModal">给TA私信</button>
 					</div>
 				</div>
-				<!-- 弹出框 -->
+				<!-- 发送私信弹出框 -->
 				<div class="modal fade" id="sendModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 					<div class="modal-dialog modal-lg" role="document">
 						<div class="modal-content">
@@ -85,7 +86,7 @@
 								<form>
 									<div class="form-group">
 										<label for="recipient-name" class="col-form-label">发给：</label>
-										<input type="text" class="form-control" id="recipient-name" value="落基山脉下的闲人">
+										<input type="text" class="form-control" id="recipient-name" th:value="${target.username}">
 									</div>
 									<div class="form-group">
 										<label for="message-text" class="col-form-label">内容：</label>
@@ -112,98 +113,40 @@
 							</div>
 						</div>
 					</div>
-				</div>						
-				
+				</div>
+
 				<!-- 私信列表 -->
+<!--				//q:display: flex;justify-content: flex-end是什么样式-->
+<!--				//a:display: flex;justify-content: flex-end是让元素靠右显示,这个右是指父元素的右边-->
 				<ul class="list-unstyled mt-4">
-					<li class="media pb-3 pt-3 mb-2">
-						<a href="profile.html">
-							<img src="http://images.nowcoder.com/head/8t.png" class="mr-4 rounded-circle user-header" alt="用户头像" >
+					<li class="media pb-3 pt-3 mb-2" th:each="map:${letters}"  th:style="|${map.meSend==null?'':'display: flex;justify-content: flex-end'}|">
+						<a th:href="@{|/user/profile/${map.youSend.id}|}" th:if="${map.youSend}!=null">
+							<img th:src="${map.youSend.headerUrl}" class="mr-4 rounded-circle user-header" alt="用户头像" >
 						</a>
 						<div class="toast show d-lg-block" role="alert" aria-live="assertive" aria-atomic="true">
 							<div class="toast-header">
-								<strong class="mr-auto">落基山脉下的闲人</strong>
-								<small>2019-04-25 15:49:32</small>
-								<button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-									<span aria-hidden="true">&times;</span>
+								<strong class="mr-auto" th:if="${map.youSend}!=null" th:utext="${map.youSend.username}">落基山脉下的闲人</strong>
+								<strong class="mr-auto" th:if="${map.meSend}!=null"  th:utext="${map.meSend.username}">落基山脉下的闲人</strong>
+								<small th:text="${#dates.format(map.letter.createTime,'yyyy-MM-dd HH:mm:ss')}">2019-04-25 15:49:32</small>
+								<input type="hidden" th:value="${map.letter.id}">
+								<button type="button" class="ml-2 mb-1 close closeMsg" data-dismiss="toast" aria-label="Close" id="deleteMsg" th:if="${map.meSend}!=null">
+									<span aria-hidden="true">x</span>
 								</button>
 							</div>
-							<div class="toast-body">
+							<div class="toast-body" style="text-align: left" th:if="${map.youSend}!=null" th:utext="${map.letter.content}">
+								君不见, 黄河之水天上来, 奔流到海不复回!
+							</div>
+							<div class="toast-body" style="text-align: right" th:if="${map.meSend}!=null" th:utext="${map.letter.content}">
 								君不见, 黄河之水天上来, 奔流到海不复回!
 							</div>
 						</div>
+						<a th:href="@{|/user/profile/${map.meSend.id}|}" th:if="${map.meSend}!=null">
+							<img th:src="${map.meSend.headerUrl}" style="margin-left: 35px" class="mr-4 rounded-circle user-header" alt="用户头像" >
+						</a>
 					</li>
-					<li class="media pb-3 pt-3 mb-2">
-						<a href="profile.html">
-							<img src="http://images.nowcoder.com/head/1t.png" class="mr-4 rounded-circle user-header" alt="用户头像" >
-						</a>
-						<div class="toast show d-lg-block" role="alert" aria-live="assertive" aria-atomic="true">
-							<div class="toast-header">
-								<strong class="mr-auto">nowcoder</strong>
-								<small>2019-04-25 15:49:32</small>
-								<button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-									<span aria-hidden="true">&times;</span>
-								</button>
-							</div>
-							<div class="toast-body">
-								君不见, 高堂明镜悲白发, 朝如青丝暮成雪!
-							</div>
-						</div>
-					</li>	
-					<li class="media pb-3 pt-3 mb-2">
-						<a href="profile.html">
-							<img src="http://images.nowcoder.com/head/8t.png" class="mr-4 rounded-circle user-header" alt="用户头像" >
-						</a>
-						<div class="toast show d-lg-block" role="alert" aria-live="assertive" aria-atomic="true">
-							<div class="toast-header">
-								<strong class="mr-auto">落基山脉下的闲人</strong>
-								<small>2019-04-25 15:49:32</small>
-								<button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-									<span aria-hidden="true">&times;</span>
-								</button>
-							</div>
-							<div class="toast-body">
-								人生得意须尽欢, 莫使金樽空对月!
-							</div>
-						</div>
-					</li>
-					<li class="media pb-3 pt-3 mb-2">
-						<a href="profile.html">
-							<img src="http://images.nowcoder.com/head/1t.png" class="mr-4 rounded-circle user-header" alt="用户头像" >
-						</a>
-						<div class="toast show d-lg-block" role="alert" aria-live="assertive" aria-atomic="true">
-							<div class="toast-header">
-								<strong class="mr-auto">nowcoder</strong>
-								<small>2019-04-25 15:49:32</small>
-								<button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-									<span aria-hidden="true">&times;</span>
-								</button>
-							</div>
-							<div class="toast-body">
-								天生我才必有用, 千金散尽还复来!
-							</div>
-						</div>
-					</li>	
-					<li class="media pb-3 pt-3 mb-2">
-						<a href="profile.html">
-							<img src="http://images.nowcoder.com/head/8t.png" class="mr-4 rounded-circle user-header" alt="用户头像" >
-						</a>
-						<div class="toast show d-lg-block" role="alert" aria-live="assertive" aria-atomic="true">
-							<div class="toast-header">
-								<strong class="mr-auto">落基山脉下的闲人</strong>
-								<small>2019-04-25 15:49:32</small>
-								<button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-									<span aria-hidden="true">&times;</span>
-								</button>
-							</div>
-							<div class="toast-body">
-								岑夫子, 丹丘生, 将进酒, 杯莫停. 钟鼓馔玉不足贵, 但愿长醉不复醒!
-							</div>
-						</div>
-					</li>																																																										
 				</ul>
 				<!-- 分页 -->
-				<nav class="mt-5">
+				<nav class="mt-5" th:replace="index::pagination">
 					<ul class="pagination justify-content-center">
 						<li class="page-item"><a class="page-link" href="#">首页</a></li>
 						<li class="page-item disabled"><a class="page-link" href="#">上一页</a></li>
@@ -284,8 +227,12 @@
 
 	<script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" crossorigin="anonymous"></script>
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" crossorigin="anonymous"></script>
-	<script src="../js/global.js"></script>
-	<script src="../js/letter.js"></script>
+	<script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js" crossorigin="anonymous"></script>
+	<script th:src="@{/js/global.js}"></script>
+	<script th:src="@{/js/letter.js}"></script>
 </body>
 </html>
+
+
+
+

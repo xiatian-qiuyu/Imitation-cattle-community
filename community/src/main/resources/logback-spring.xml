@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <contextName>community</contextName>
+    //日志文件路径
     <property name="LOG_PATH" value="D:/work/data"/>
     <property name="APPDIR" value="community"/>
 

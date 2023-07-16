@@ -6,15 +6,50 @@
     <sql id="selectFields">
         id,user_id,title,content,type,status,create_time,comment_count,score
     </sql>
+
+    <sql id="insertFields">
+        user_id, title, content, type, status, create_time, comment_count, score
+    </sql>
+
+    <insert id="inseretDiscussPost" parameterType="discussPost" keyProperty="id">
+        insert into discuss_post(<include refid="insertFields"></include>)
+        values (#{userId},#{title},#{content},#{type},#{status},#{createTime},#{commentCount},#{score})
+    </insert>
+
+    <update id="updateCommentCount" parameterType="discussPost">
+        update discuss_post
+        set comment_count = #{commentCount}
+        where id = #{id}
+    </update>
+    <update id="updateDiscussPostType" parameterType="discussPost">
+        update discuss_post
+        set type = #{type}
+        where id =#{id}
+    </update>
+    <update id="updateDiscussPostStatus" parameterType="discussPost">
+        update discuss_post
+        set status = #{status}
+        where id = #{id}
+    </update>
+    <update id="updateDiscussPostScore" parameterType="discussPost">
+        update discuss_post
+        set score = #{score}
+        where id = #{id}
+    </update>
+
     <select id="selectDiscussPosts" resultType="com.nowcoder.community.entity.DiscussPost">
         select <include refid="selectFields"></include>
         from discuss_post
         where status !=2
---         动态sql
         <if test="userId!=0">
             and user_id=#{userId}
         </if>
-        order by type desc,create_time desc
+        <if test="orderMode==0">
+            order by type desc,create_time desc
+        </if>
+        <if test="orderMode==1">
+            order by type desc,score desc,create_time desc
+        </if>
         limit #{offset},#{limit}
     </select>
     <select id="selectDisscussPostRow" resultType="java.lang.Integer">
@@ -24,5 +59,11 @@
         <if test="userId!=0">
             and user_id=#{userId}
         </if>
+    </select>
+    <select id="selectDiscussPostById" resultType="com.nowcoder.community.entity.DiscussPost">
+        select
+            <include refid="selectFields"></include>
+        from discuss_post
+        where id = #{id}
     </select>
 </mapper>

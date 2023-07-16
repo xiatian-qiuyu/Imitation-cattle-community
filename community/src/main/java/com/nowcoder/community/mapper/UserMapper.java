@@ -1,5 +1,6 @@
 package com.nowcoder.community.mapper;
 
+import com.nowcoder.community.entity.LoginTicket;
 import com.nowcoder.community.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
@@ -17,4 +18,16 @@ public interface UserMapper {
     User selectUserByName(String username);
     //通过邮箱查询用户
     User selectByEmail(String email);
+
+    //添加用户数据
+    int inseretUser(User user);
+
+    int updateStatus(int userId, int statusCode);
+
+    int updateHeader(int id, String headerUrl);
+
+    void updatePassword(int id, String password);
+
+    LoginTicket selectLoginTicket(String ticket);
+
 }
